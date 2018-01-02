@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
   devtool: 'eval-source-map',
   entry: __dirname + "/app/main.js", //已多次提及的唯一入口文件
@@ -18,10 +20,7 @@ module.exports = {
     rules: [{
       test: /\.jsx?$/, // test 去判断是否为.js或.jsx,是的话就是进行es6和jsx的编译
       exclude: /(node_modules|bower_components)/,
-      loader: 'babel-loader',
-      query: {
-        presets: ['es2015', 'react']
-      }
+      loader: 'babel-loader'
     }, {
       test: /\.css$/,
       use: [{
@@ -34,5 +33,9 @@ module.exports = {
         }
       }]
     }]
-  }
+  },
+  plugins: [
+    new webpack.BannerPlugin('版权所有，翻版必究'),
+    new webpack.HotModuleReplacementPlugin()//热加载插件
+  ]
 }
