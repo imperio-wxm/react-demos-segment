@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack",
-    "server": "webpack-dev-server --open"
+    "server": "webpack-dev-server --content-base build --inline"
   },
   "author": "wxmimperio",
   "license": "ISC",
