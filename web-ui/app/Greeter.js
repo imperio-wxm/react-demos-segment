@@ -15,6 +15,7 @@ function setJson(jsonStr,name,value) {
 
 class Greeter extends Component{
 
+
   componentDidMount() {
       let urls = [
         "http://localhost:8900/upgrade/getTopicByName/pt_asc_all"
