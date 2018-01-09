@@ -6,6 +6,8 @@ import { Router, Route, Link, hashHistory, IndexRoute, Redirect, IndexLink, brow
 
 import './main.css'
 import ConversionPanel from './js/components/common/conversion-panel/ConversionPanel.js'
+import HDFSPanel from './js/components/common/hdfs-panel/HDFSPanel.js'
+import HBasePanel from './js/components/common/hbase-panel/HBasePanel.js'
 
 import {Layout, Menu, Breadcrumb, Icon} from 'antd';
 const {Header, Content, Footer, Sider} = Layout;
@@ -21,7 +23,6 @@ class MainMenu extends React.Component {
     }
 
     onCollapse = (collapsed) => {
-        console.log(collapsed);
         this.setState({collapsed});
     }
 
@@ -29,7 +30,6 @@ class MainMenu extends React.Component {
         this.setState({
             current: e.key
         })
-        console.log(e.key);
     }
 
     componentDidMount() {
@@ -40,27 +40,31 @@ class MainMenu extends React.Component {
             <Layout style={{minHeight: '100vh'}}>
                 <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
                     <div className="logo"/>
-                    <Menu theme="dark" onClick={this.handleClick} mode="inline">
+                    <Menu theme="dark" defaultSelectedKeys={['1']} onClick={this.handleClick} mode="inline">
                         <Menu.Item key="1">
-                            <Link to="/conversionPanel">
+                            <Link to="/">
                                 <Icon type="desktop"/>
                                 <span>ORC 转换</span>
                             </Link>
                         </Menu.Item>
                         <Menu.Item key="2">
-                            <Icon type="file"/>
-                            <span>HDFS Topics</span>
+                            <Link to="/hDFSPanel">
+                                <Icon type="file"/>
+                                <span>HDFS Topics</span>
+                            </Link>
                         </Menu.Item>
                         <Menu.Item key="3">
-                            <Icon type="file"/>
-                            <span>HBbase Topics</span>
+                            <Link to="/hBasePanel">
+                                <Icon type="file"/>
+                                <span>HBbase Topics</span>
+                            </Link>
                         </Menu.Item>
                     </Menu>
                 </Sider>
                 <Layout>
                     <Header style={{background: '#fff', padding: 0}}/>
                     <Content style={{margin: '0 16px'}}>
-                        <Breadcrumb style={{margin: '16px 0'}}>
+                        <Breadcrumb style={{margin: '20px 0'}}>
                             <Breadcrumb.Item>Upgrade</Breadcrumb.Item>
                         </Breadcrumb>
                         { this.props.children }
@@ -79,8 +83,9 @@ class MainMenu extends React.Component {
 render((
     <Router history={hashHistory} >
         <Route path="/" component={MainMenu}>
-          <IndexRoute component={MainMenu} />
-          <Route path="conversionPanel" component={ConversionPanel} />
+          <IndexRoute component={ConversionPanel} />
+          <Route path="hDFSPanel" component={HDFSPanel} />
+          <Route path="hBasePanel" component={HBasePanel} />
         </Route>
     </Router>
 ), document.getElementById('root'));
