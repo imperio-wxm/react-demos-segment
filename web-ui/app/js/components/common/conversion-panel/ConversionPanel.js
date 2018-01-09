@@ -15,8 +15,7 @@ export default class ConversionPanel extends React.Component{
             tablesInfo: []
         }
     }
-
-    componentDidMount() {
+    getData = () => {
         let urls = [
             "http://localhost:8900/upgrade/get/getAllTables"
         ];
@@ -43,10 +42,18 @@ export default class ConversionPanel extends React.Component{
         })
     }
 
+    componentDidMount() {
+       this.getData();
+    }
+
+    update = (newState) => {
+        this.getData();
+    }
+
     render() {
         return (
             <div style={{padding: 24, background: '#fff', minHeight: 360}}>
-                 <Conversion tablesNum={this.state.tablesNum} tablesInfo={this.state.tablesInfo}/>
+                 <Conversion tablesNum={this.state.tablesNum} tablesInfo={this.state.tablesInfo} updateConversionPanel={this.update}/>
             </div>
         );
     }

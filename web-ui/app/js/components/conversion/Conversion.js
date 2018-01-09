@@ -6,6 +6,7 @@ import { Router, Route, Link, hashHistory, IndexRoute, Redirect, IndexLink, brow
 import { Table, Button } from 'antd';
 
 import HTTPUtil from '../../actions/fetch/FetchUtils.js'
+import CommonUtils from '../common/utils/CommonUtils.js'
 
 const columns = [{
         title: 'Id',
@@ -29,31 +30,63 @@ const columns = [{
 ];
     
 export default class Conversion extends React.Component {
-    state = {
-        selectedRowKeys: [], // Check here to configure the default column
-        loading: false
-    };
+    constructor(props) {
+        super(props)
+        this.state = {
+            selectedRowKeys: [],
+            loading: false,
+            data: []
+        }
+    }
+
     componentDidMount() {
     }
+
+    upgradeTable = (tableInfo) => {
+        let tableInfoAll;
+        tableInfoAll = CommonUtils.setJson(null,"table_status","running");
+        tableInfoAll = CommonUtils.setJson(tableInfoAll,"id",tableInfo.id);
+        tableInfoAll = CommonUtils.setJson(tableInfoAll,"table_name",tableInfo.table_name);
+        tableInfoAll = CommonUtils.setJson(tableInfoAll,"upgrade_time",CommonUtils.formatDate(new Date()));
+        HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", tableInfoAll)
+    }
+
+    updateConversionPanel = (status) =>{
+        this.props.updateConversionPanel(status);
+    }
+
     start = () => {
         this.setState({ loading: true });
         // ajax request after empty completing
         setTimeout(() => {
-            console.log(this.state.selectedRowKeys)
+            console.table(this.state.selectedRowKeys)
             for (var key in this.state.selectedRowKeys) {
-                console.log('cacheData: ', this.props.tablesInfo[key]);
+                console.log('cacheData: ', this.props.tablesInfo[this.state.selectedRowKeys[key]]);
+                let urls = [
+                    "http://localhost:8900/upgrade/getTopicByName/" + this.props.tablesInfo[this.state.selectedRowKeys[key]].table_name
+                ];
+                HTTPUtil.URLs(urls).then((text) => {
+                    if(text.size != 0 ){
+                        this.upgradeTable(JSON.parse(text[0]));
+                    }else{
+                        console.log("fetch exception " + text.code);
+                    }
+                },(text)=>{
+                    console.log("fetch fail " + text.code);
+                })
             }
-            
             this.setState({
                 selectedRowKeys: [],
                 loading: false,
             });
+            this.updateConversionPanel(true);
         }, 1000);
     }
     onSelectChange = (selectedRowKeys) => {
         console.log('selectedRowKeys changed: ', selectedRowKeys);
         this.setState({ selectedRowKeys });
     }
+
     render() {
         let tablesNum = this.props.tablesNum;
         let tablesInfo = this.props.tablesInfo;
@@ -69,7 +102,7 @@ export default class Conversion extends React.Component {
                 finish_time: `${item.finish_time}`
             });
         })
-    
+
         const { loading, selectedRowKeys } = this.state;
         const rowSelection = {
             selectedRowKeys,
