@@ -7,6 +7,7 @@ import { Table, Button } from 'antd';
 
 import HTTPUtil from '../../actions/fetch/FetchUtils.js'
 import CommonUtils from '../common/utils/CommonUtils.js'
+import './css/conversion.css'
 
 const columns = [{
         title: 'Id',
@@ -35,39 +36,50 @@ export default class Conversion extends React.Component {
         this.state = {
             selectedRowKeys: [],
             loading: false,
-            data: []
+            data: [],
+            num: ''
         }
     }
 
     componentDidMount() {
     }
 
-    upgradeTable = (tableInfo) => {
+    upgradeTable = (tableInfo,rowKey) => {
         let tableInfoAll;
         tableInfoAll = CommonUtils.setJson(null,"table_status","running");
         tableInfoAll = CommonUtils.setJson(tableInfoAll,"id",tableInfo.id);
         tableInfoAll = CommonUtils.setJson(tableInfoAll,"table_name",tableInfo.table_name);
+        tableInfoAll = CommonUtils.setJson(tableInfoAll,"table_type","hbase");
         tableInfoAll = CommonUtils.setJson(tableInfoAll,"upgrade_time",CommonUtils.formatDate(new Date()));
-        HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", tableInfoAll)
+        var status = HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", tableInfoAll);
     }
 
-    updateConversionPanel = (status) =>{
+    /**
+     * 更新父组件回调
+     */
+    updateConversionPanel = (status) => {
         this.props.updateConversionPanel(status);
     }
 
+    refresh = () => {
+        this.updateConversionPanel(true);
+    }
+
     start = () => {
-        this.setState({ loading: true });
+        this.setState({ 
+            loading: true
+        });
         // ajax request after empty completing
         setTimeout(() => {
-            console.table(this.state.selectedRowKeys)
             for (var key in this.state.selectedRowKeys) {
-                console.log('cacheData: ', this.props.tablesInfo[this.state.selectedRowKeys[key]]);
+                var realKey = this.state.selectedRowKeys[key];
                 let urls = [
-                    "http://localhost:8900/upgrade/getTopicByName/" + this.props.tablesInfo[this.state.selectedRowKeys[key]].table_name
+                    "http://localhost:8900/upgrade/getTopicByName/" + this.state.data[realKey].table_name
                 ];
                 HTTPUtil.URLs(urls).then((text) => {
                     if(text.size != 0 ){
-                        this.upgradeTable(JSON.parse(text[0]));
+                        this.upgradeTable(JSON.parse(text[0]),realKey);
+                        this.updateConversionPanel(true);
                     }else{
                         console.log("fetch exception " + text.code);
                     }
@@ -79,29 +91,17 @@ export default class Conversion extends React.Component {
                 selectedRowKeys: [],
                 loading: false,
             });
-            this.updateConversionPanel(true);
         }, 1000);
     }
+    
     onSelectChange = (selectedRowKeys) => {
         console.log('selectedRowKeys changed: ', selectedRowKeys);
         this.setState({ selectedRowKeys });
     }
 
     render() {
-        let tablesNum = this.props.tablesNum;
-        let tablesInfo = this.props.tablesInfo;
-
-        const data = [];
-        tablesInfo.map((item, index)=>{
-            data.push({
-                id: `${item.id}`,
-                table_name: `${item.table_name}`,
-                table_type: `${item.table_type}`,
-                table_status: `${item.table_status}`,
-                upgrade_time: `${item.upgrade_time}`,
-                finish_time: `${item.finish_time}`
-            });
-        })
+        this.state.num = this.props.tablesNum;
+        this.state.data = this.props.tablesInfo;
 
         const { loading, selectedRowKeys } = this.state;
         const rowSelection = {
@@ -112,14 +112,19 @@ export default class Conversion extends React.Component {
         return (
             <div>
                 <div style={{ marginBottom: 16 }}>
-                    <Button type="primary" onClick={this.start} disabled={!hasSelected} loading={loading}>
-                        转换
-                    </Button>
+                    <div className="table-operations">
+                        <Button type="primary" onClick={this.start} disabled={!hasSelected} loading={loading}>
+                            转换
+                        </Button>
+                        <Button type="primary" onClick={this.refresh} >
+                            刷新
+                        </Button>
+                    </div>
                     <span style={{ marginLeft: 8 }}>
                         {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
                     </span>
                 </div>
-                <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+                <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.data} />
             </div>
         );
     }

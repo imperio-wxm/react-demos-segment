@@ -15,6 +15,7 @@ export default class ConversionPanel extends React.Component{
             tablesInfo: []
         }
     }
+
     getData = () => {
         let urls = [
             "http://localhost:8900/upgrade/get/getAllTables"
@@ -23,20 +24,19 @@ export default class ConversionPanel extends React.Component{
         let tableInfoAll;
 
         HTTPUtil.URLs(urls).then((text) => {
-        if(text.size != 0 ){
-            let tableInfo = JSON.parse(text[0]);
-            var tablesDetails = [];
-
-            for(var o in tableInfo){
-                tablesDetails.push(tableInfo[o]);
+            if(text.size != 0 ){
+                let tableInfo = JSON.parse(text[0]);
+                var tablesDetails = [];
+                for(var o in tableInfo){
+                    tablesDetails.push(tableInfo[o]);
+                }
+                this.setState({
+                    tablesNum : tableInfo.length,
+                    tablesInfo : tablesDetails
+                })
+            }else{
+                console.log("fetch exception " + text.code);
             }
-            this.setState({
-                tablesNum : tableInfo.length,
-                tablesInfo : tablesDetails
-            })
-        }else{
-            console.log("fetch exception " + text.code);
-        }
         },(text)=>{
             console.log("fetch fail " + text.code);
         })
