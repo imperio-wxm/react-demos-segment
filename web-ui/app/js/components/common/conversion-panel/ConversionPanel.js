@@ -16,11 +16,28 @@ export default class ConversionPanel extends React.Component{
         }
     }
 
-    getData = () => {
-        let urls = [
-            "http://localhost:8900/upgrade/get/getAllTables"
-        ];
-
+    getData = (status) => {
+        let urls = [];
+        switch(status) {
+            case "Hive":
+            case "HBase":
+                urls = [
+                    "http://localhost:8900/upgrade/get/getTablesByType/" + status
+                ];
+                break;
+            case "Init":
+            case "Running":
+            case "Finish":
+                urls = [
+                    "http://localhost:8900/upgrade/get/getTablesByStatus/" + status
+                ];
+                break;
+            default:
+                urls = [
+                    "http://localhost:8900/upgrade/get/getAllTables"
+                ];
+                break;
+        }
         let tableInfoAll;
         HTTPUtil.URLs(urls).then((text) => {
             if(text.size != 0 ){
@@ -46,7 +63,7 @@ export default class ConversionPanel extends React.Component{
     }
 
     update = (newState) => {
-        this.getData();
+        this.getData(newState);
     }
 
     render() {

@@ -10,17 +10,13 @@ import HTTPUtil from '../../actions/fetch/FetchUtils.js'
 import CommonUtils from '../common/utils/CommonUtils.js'
 import './css/conversion.css'
 
-const upgradeStart = (tableName) => {
-    message.info('Table=' + tableName + ",  upgrading........", 10);
-};
-
 const TableStatus = React.createClass({
     render() {
         let tableStatus = this.props.status;
         let badgeStatus = "default"; 
-        if(tableStatus == "running") {
+        if(tableStatus == "Running") {
             badgeStatus = "processing";
-        } else if(tableStatus == "finish") {
+        } else if(tableStatus == "Finish") {
             badgeStatus = "success";
         }
         return (
@@ -28,18 +24,6 @@ const TableStatus = React.createClass({
         );
     }
 })
-
-function handleMenuClick(e) {
-    message.info('Click on menu item. key = ' + e.key);
-    console.log("key = ",e.key);
-}
-
-const menu = (
-    <Menu onClick={handleMenuClick} >
-      <Menu.Item key="1">Hive</Menu.Item>
-      <Menu.Item key="2">HBase</Menu.Item>
-    </Menu>
-);
 
 const columns = [{
         title: 'Id',
@@ -77,13 +61,33 @@ export default class Conversion extends React.Component {
 
     upgradeTable = (tableInfo,rowKey) => {
         let tableInfoAll;
-        tableInfoAll = CommonUtils.setJson(null,"table_status","running");
+        tableInfoAll = CommonUtils.setJson(null,"table_status","Running");
         tableInfoAll = CommonUtils.setJson(tableInfoAll,"id",tableInfo.id);
         tableInfoAll = CommonUtils.setJson(tableInfoAll,"table_name",tableInfo.table_name);
         tableInfoAll = CommonUtils.setJson(tableInfoAll,"upgrade_time",CommonUtils.formatDate(new Date()));
         var status = HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", tableInfoAll);
-        upgradeStart(tableInfo.table_name);
+        message.info('Table=' + tableInfo.table_name + ",  upgrading........", 10);
     }
+
+    handleMenuClick = (e) => {
+        this.updateConversionPanel(e.key);
+    }
+
+    typeMenu = (
+        <Menu onClick={this.handleMenuClick} >
+          <Menu.Item key="all">All</Menu.Item>
+          <Menu.Item key="Hive">Hive</Menu.Item>
+          <Menu.Item key="HBase">HBase</Menu.Item>
+        </Menu>
+    );
+
+    statusMenu = (
+        <Menu onClick={this.handleMenuClick} >
+          <Menu.Item key="Init">Init</Menu.Item>
+          <Menu.Item key="Running">Running</Menu.Item>
+          <Menu.Item key="Finish">Finish</Menu.Item>
+        </Menu>
+    );
 
     /**
      * 更新父组件回调
@@ -163,9 +167,16 @@ export default class Conversion extends React.Component {
                         <Switch checkedChildren="开" unCheckedChildren="关" onChange={this.autoRefresh} />
                     </FormItem>
                     <FormItem>
-                        <Dropdown overlay={menu}>
+                        <Dropdown overlay={this.typeMenu}>
                             <Button style={{ marginLeft: 8 }}>
                                 分类 <Icon type="down" />
+                            </Button>
+                        </Dropdown>
+                    </FormItem>
+                    <FormItem>
+                        <Dropdown overlay={this.statusMenu}>
+                            <Button style={{ marginLeft: 8 }}>
+                                状态过滤 <Icon type="down" />
                             </Button>
                         </Dropdown>
                     </FormItem>
