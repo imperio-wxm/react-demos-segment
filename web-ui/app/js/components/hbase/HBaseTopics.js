@@ -47,7 +47,7 @@ export default class HBaseTopics extends React.Component {
                         刷新
                     </Button>
                 </div>
-                <Table columns={columns} dataSource={this.state.data} />
+                <Table columns={columns} dataSource={this.state.data} footer={() => <div>All Size：{this.state.data.length}</div>} />
             </div>
         );
     }

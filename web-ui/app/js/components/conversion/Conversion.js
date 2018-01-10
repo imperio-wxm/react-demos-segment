@@ -184,7 +184,8 @@ export default class Conversion extends React.Component {
                     </FormItem>
                 </Form>
                 </div>
-                <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.data} />
+                <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.data} 
+                    footer={() => <div>All Size：{this.state.data.length}</div>} />
             </div>
         );
     }
