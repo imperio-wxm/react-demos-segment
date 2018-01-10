@@ -22,7 +22,6 @@ export default class ConversionPanel extends React.Component{
         ];
 
         let tableInfoAll;
-
         HTTPUtil.URLs(urls).then((text) => {
             if(text.size != 0 ){
                 let tableInfo = JSON.parse(text[0]);
