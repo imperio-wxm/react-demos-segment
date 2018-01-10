@@ -27,7 +27,7 @@ const TableStatus = React.createClass({
 
 const columns = [{
         title: 'Id',
-        dataIndex: 'id',
+        dataIndex: 'table_id',
     }, {
         title: 'Table Name',
         dataIndex: 'table_name',
@@ -39,6 +39,9 @@ const columns = [{
         dataIndex: 'table_status',
         render: (text) => <TableStatus status={text} />
     }, {
+        title: 'Upgrade PartDate',
+        dataIndex: 'part_date',
+    },{
         title: 'Upgrade Time',
         dataIndex: 'upgrade_time',
     }, {
@@ -52,6 +55,7 @@ export default class Conversion extends React.Component {
         super(props)
         this.state = {
             selectedRowKeys: [],
+            selectedRows: [],
             loading: false,
             data: [],
             num: '',
@@ -59,14 +63,13 @@ export default class Conversion extends React.Component {
         }
     }
 
-    upgradeTable = (tableInfo,rowKey) => {
-        let tableInfoAll;
-        tableInfoAll = CommonUtils.setJson(null,"table_status","Running");
-        tableInfoAll = CommonUtils.setJson(tableInfoAll,"id",tableInfo.id);
-        tableInfoAll = CommonUtils.setJson(tableInfoAll,"table_name",tableInfo.table_name);
-        tableInfoAll = CommonUtils.setJson(tableInfoAll,"upgrade_time",CommonUtils.formatDate(new Date()));
-        var status = HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", tableInfoAll);
+    upgradeTable = (tableInfo) => {
+        tableInfo.table_status = "Running";
+        tableInfo.part_date = CommonUtils.formatDate(new Date()).substring(0,10);
+        tableInfo.upgrade_time = CommonUtils.formatDate(new Date());
+        var status = HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", JSON.stringify(tableInfo));
         message.info('Table=' + tableInfo.table_name + ",  upgrading........", 10);
+        console.log("更新")
     }
 
     handleMenuClick = (e) => {
@@ -97,6 +100,7 @@ export default class Conversion extends React.Component {
     }
 
     refresh = () => {
+        console.log("刷新");
         this.updateConversionPanel(true);
     }
 
@@ -106,15 +110,15 @@ export default class Conversion extends React.Component {
         });
         // ajax request after empty completing
         setTimeout(() => {
-            for (var key in this.state.selectedRowKeys) {
-                var realKey = this.state.selectedRowKeys[key];
+            for (var key in this.state.selectedRows) {
+                var jsonData = this.state.selectedRows[key];
                 let urls = [
-                    "http://localhost:8900/upgrade/getTopicByName/" + this.state.data[realKey].table_name
+                    "http://localhost:8900/upgrade/getTopicByName/" + jsonData.table_name
                 ];
                 HTTPUtil.URLs(urls).then((text) => {
                     if(text.size != 0 ){
-                        this.upgradeTable(JSON.parse(text[0]),realKey);
-                        this.updateConversionPanel(true);
+                        this.upgradeTable(JSON.parse(text[0]));
+                        this.refresh();
                     }else{
                         console.log("fetch exception " + text.code);
                     }
@@ -124,26 +128,29 @@ export default class Conversion extends React.Component {
             }
             this.setState({
                 selectedRowKeys: [],
+                selectedRows: [],
                 loading: false,
             });
-        }, 1000);
+        }, 500);
     }
 
     componentWillUnmount() {
         clearInterval(this.state.timer);
     }
+
+    componentDidMount() {
+    }
     
-    onSelectChange = (selectedRowKeys) => {
-        console.log('selectedRowKeys changed: ', selectedRowKeys);
-        this.setState({ selectedRowKeys });
+    onSelectChange = (selectedRowKeys,selectedRows) => {
+        this.setState({ selectedRowKeys, selectedRows });
     }
 
     autoRefresh = (enable) => {
         if(enable) {
             this.state.timer = setInterval(() => {
-                console.log('enable: ', enable);
+                console.log('refresh: ', CommonUtils.formatDate(new Date()));
                 this.updateConversionPanel(true);
-            }, 5000);
+            }, 60 * 1000);
         } else {
             clearInterval(this.state.timer);
         }
@@ -157,8 +164,11 @@ export default class Conversion extends React.Component {
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
+            hideDefaultSelections: true,
+            onSelection: this.onSelection,
         };
         const hasSelected = selectedRowKeys.length > 0;
+
         return (
             <div>
                 <div className="table-operations">

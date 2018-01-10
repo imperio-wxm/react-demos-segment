@@ -6,6 +6,7 @@ import { Router, Route, Link, hashHistory, IndexRoute, Redirect, IndexLink, brow
 
 import HTTPUtil from '../../../actions/fetch/FetchUtils.js'
 import Conversion from '../../../components/conversion/Conversion.js'
+import CommonUtils from '../../common/utils/CommonUtils.js'
 
 export default class ConversionPanel extends React.Component{
     constructor(props) {
@@ -33,29 +34,33 @@ export default class ConversionPanel extends React.Component{
                 ];
                 break;
             default:
+                console.log(status);
                 urls = [
                     "http://localhost:8900/upgrade/get/getAllTables"
                 ];
                 break;
         }
         let tableInfoAll;
-        HTTPUtil.URLs(urls).then((text) => {
-            if(text.size != 0 ){
-                let tableInfo = JSON.parse(text[0]);
-                var tablesDetails = [];
-                for(var o in tableInfo){
-                    tablesDetails.push(tableInfo[o]);
+        setTimeout(() => {
+            HTTPUtil.URLs(urls).then((text) => {
+                if(text.size != 0 ){
+                    let tableInfo = JSON.parse(text[0]);
+                    var tablesDetails = [];
+                    for(var i in tableInfo){
+                        tableInfo[i].key = i;
+                        tablesDetails.push(tableInfo[i]);
+                    }
+                    this.setState({
+                        tablesNum : tableInfo.length,
+                        tablesInfo : tablesDetails
+                    })
+                }else{
+                    console.log("fetch exception " + text.code);
                 }
-                this.setState({
-                    tablesNum : tableInfo.length,
-                    tablesInfo : tablesDetails
-                })
-            }else{
-                console.log("fetch exception " + text.code);
-            }
-        },(text)=>{
-            console.log("fetch fail " + text.code);
-        })
+            },(text)=>{
+                console.log("fetch fail " + text.code);
+            })
+        }, 500)
     }
 
     componentDidMount() {
