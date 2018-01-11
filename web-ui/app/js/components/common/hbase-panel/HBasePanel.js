@@ -18,7 +18,7 @@ export default class HBasePanel extends React.Component{
 
     getData = () => {
         let urls = [
-            "/configInfo/get/getHBaseTopics"
+            "/api/configInfo/get/getHBaseTopics"
         ];
 
         let tableInfoAll;

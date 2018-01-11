@@ -18,7 +18,7 @@ export default class HDFSPanel extends React.Component{
 
     getData = () => {
         let urls = [
-            "/configInfo/get/getHDFSTopics"
+            "/api/configInfo/get/getHDFSTopics"
         ];
 
         let tableInfoAll;

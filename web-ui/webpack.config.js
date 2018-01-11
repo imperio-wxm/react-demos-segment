@@ -14,7 +14,16 @@ module.exports = {
     contentBase: "./resources/static/js", //本地服务器所加载的页面所在的目录
     historyApiFallback: true, //不跳转
     inline: true, //实时刷新
-    port: 8901
+    host: 'localhost', //本地前端服务
+    port: 8901,
+    proxy: {
+      '/api/*': {
+          target: 'http://localhost:8900', // 本地后端服务
+          changeOrigin: true,
+          pathRewrite: {'^/api': ''},
+          secure: false
+      }
+    }
   },
   resolve: {
     extensions: ['*', '.js', '.json', '.scss', '.less', 'jsonp'],

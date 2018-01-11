@@ -23,20 +23,20 @@ export default class ConversionPanel extends React.Component{
             case "Hive":
             case "HBase":
                 urls = [
-                    "/upgrade/get/getTablesByType/" + status
+                    "/api/upgrade/get/getTablesByType/" + status
                 ];
                 break;
             case "Init":
             case "Running":
             case "Finish":
                 urls = [
-                    "/upgrade/get/getTablesByStatus/" + status
+                    "/api/upgrade/get/getTablesByStatus/" + status
                 ];
                 break;
             default:
                 console.log(status);
                 urls = [
-                    "/upgrade/get/getAllTables"
+                    "/api/upgrade/get/getAllTables"
                 ];
                 break;
         }

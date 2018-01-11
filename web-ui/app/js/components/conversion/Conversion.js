@@ -67,7 +67,7 @@ export default class Conversion extends React.Component {
         tableInfo.table_status = "Running";
         tableInfo.part_date = CommonUtils.formatDate(new Date()).substring(0,10);
         tableInfo.upgrade_time = CommonUtils.formatDate(new Date());
-        var status = HTTPUtil.post("/upgrade/update/sequenceToOrcInfo", JSON.stringify(tableInfo));
+        var status = HTTPUtil.post("/api/upgrade/update/sequenceToOrcInfo", JSON.stringify(tableInfo));
         message.info(tableInfo.table_name + " upgrading.......", 10);
         console.log("更新")
     }
@@ -113,7 +113,7 @@ export default class Conversion extends React.Component {
             for (var key in this.state.selectedRows) {
                 var jsonData = this.state.selectedRows[key];
                 let urls = [
-                    "/upgrade/getTopicByName/" + jsonData.table_name
+                    "/api/upgrade/getTopicByName/" + jsonData.table_name
                 ];
                 HTTPUtil.URLs(urls).then((text) => {
                     if(text.size != 0 ){
