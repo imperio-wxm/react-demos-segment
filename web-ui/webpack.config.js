@@ -7,11 +7,11 @@ module.exports = {
     main: path.resolve(__dirname, './app/main.js'),
   },
   output: {
-    path: path.resolve(__dirname, './public'),
+    path: path.resolve(__dirname, './resources/static/js'),
     filename: 'bundle.js'
   },
   devServer: {
-    contentBase: "./public", //本地服务器所加载的页面所在的目录
+    contentBase: "./resources/static/js", //本地服务器所加载的页面所在的目录
     historyApiFallback: true, //不跳转
     inline: true, //实时刷新
     port: 8901

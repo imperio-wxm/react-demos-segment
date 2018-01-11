@@ -35,7 +35,7 @@
     "webpack-dev-server": "^1.16.5"
   },
   "scripts": {
-    "start": "webpack-dev-server --devtool eval --progress --open --colors --hot --inline",
-    "build": "webpack --progress --profile --colors --config webpack.pro.config.js"
+    "start": "webpack-dev-server --devtool eval --progress --open --colors --hot --inline --host localhost",
+    "build": "webpack --progress --profile --colors --config webpack.config.js"
   }
 }

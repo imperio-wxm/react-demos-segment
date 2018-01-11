@@ -67,8 +67,8 @@ export default class Conversion extends React.Component {
         tableInfo.table_status = "Running";
         tableInfo.part_date = CommonUtils.formatDate(new Date()).substring(0,10);
         tableInfo.upgrade_time = CommonUtils.formatDate(new Date());
-        var status = HTTPUtil.post("http://localhost:8900/upgrade/update/sequenceToOrcInfo", JSON.stringify(tableInfo));
-        message.info('Table=' + tableInfo.table_name + ",  upgrading........", 10);
+        var status = HTTPUtil.post("/upgrade/update/sequenceToOrcInfo", JSON.stringify(tableInfo));
+        message.info(tableInfo.table_name + " upgrading.......", 10);
         console.log("更新")
     }
 
@@ -113,10 +113,11 @@ export default class Conversion extends React.Component {
             for (var key in this.state.selectedRows) {
                 var jsonData = this.state.selectedRows[key];
                 let urls = [
-                    "http://localhost:8900/upgrade/getTopicByName/" + jsonData.table_name
+                    "/upgrade/getTopicByName/" + jsonData.table_name
                 ];
                 HTTPUtil.URLs(urls).then((text) => {
                     if(text.size != 0 ){
+                        console.log(text[0]);
                         this.upgradeTable(JSON.parse(text[0]));
                         this.refresh();
                     }else{
@@ -206,7 +207,7 @@ export default class Conversion extends React.Component {
                 </Form>
                 </div>
                 <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.data} 
-                    footer={() => <div>All Size：{this.state.data.length}</div>} />
+                    footer={() => <div><strong>All Size：{this.state.data.length}</strong></div>} />
             </div>
         );
     }

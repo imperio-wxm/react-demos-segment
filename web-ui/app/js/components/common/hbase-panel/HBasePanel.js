@@ -5,7 +5,7 @@ import { render } from 'react-dom'
 import { Router, Route, Link, hashHistory, IndexRoute, Redirect, IndexLink, browserHistory } from 'react-router'
 
 import HTTPUtil from '../../../actions/fetch/FetchUtils.js'
-import HBaseTopics from '../../hbase/HBaseTopics.js'
+import CommonTopics from '../../common/common-tables/CommonTopics.js'
 
 export default class HBasePanel extends React.Component{
     constructor(props) {
@@ -18,7 +18,7 @@ export default class HBasePanel extends React.Component{
 
     getData = () => {
         let urls = [
-            "http://localhost:8900/configInfo/get/getHBaseTopics"
+            "/configInfo/get/getHBaseTopics"
         ];
 
         let tableInfoAll;
@@ -52,7 +52,7 @@ export default class HBasePanel extends React.Component{
     render() {
         return (
             <div style={{padding: 24, background: '#fff', minHeight: 360}}>
-                <HBaseTopics tablesNum={this.state.tablesNum} tablesInfo={this.state.tablesInfo} updateConversionPanel={this.update}/>
+                <CommonTopics tablesNum={this.state.tablesNum} tablesInfo={this.state.tablesInfo} updateConversionPanel={this.update}/>
             </div>
         );
     }
