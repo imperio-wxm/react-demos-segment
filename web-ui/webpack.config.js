@@ -20,7 +20,6 @@ module.exports = {
       '/api/*': {
           target: 'http://localhost:8900', // 本地后端服务
           changeOrigin: true,
-          pathRewrite: {'^/api': ''},
           secure: false
       }
     }
